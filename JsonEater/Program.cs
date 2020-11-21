@@ -1,80 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using Newtonsoft.Json;
 
 namespace JsonEater
 {
     class Program
     {
+
         static void Main(string[] args)
         {
-            var info = new ProcessStartInfo();
-            info.FileName = @"C:\code\JsonEater\generator-windows-amd64.exe";
-            info.UseShellExecute = false;
-            info.CreateNoWindow = false;
-            info.RedirectStandardOutput = true;
-
-            IConsumeEvents consumer = new PandaConsumer(info);
-
-            while (consumer.IsUp) 
+            var config = ConfigurationReader.GetProcessPath(innerConfigLocation: "\\Configuration\\config.json");
+            var info = PandaGenerator.CreateGeneratorProcessInfo(config.ProcessPath);
+            IConsumeEvents<PandaEvent> consumer = new PandaConsumer<PandaEvent>(info); // maybe process should be outside
+            var keepGoing = true;
+            while (keepGoing)
             {
-                var d = consumer.consumeEvent();
-                if(d == null)
+                try
                 {
-                    Console.WriteLine("Error json");
+                    var d = consumer.consumeEvent();
+                    Console.WriteLine(d);
+                    Console.WriteLine($"IS process running: {consumer.IsUp}");
                 }
-                else Console.WriteLine(d["event_type"]);
+                catch
+                {
+                    keepGoing = false;
+                }
+
             }
-        }
-    }
 
-    public interface IConsumeEvents<T>
-    {
-        T consumeEvent();
-        bool IsUp { get; }
-    }
-
-    public class PandaConsumer<T> : IConsumeEvents<T>
-    {
-        private readonly Process _process ;
-        private bool _isUp;
-
-
-        public bool IsUp { get { return !_process.HasExited; } }
-        public PandaConsumer(ProcessStartInfo info)
-        {
-            _process = new Process();
-            _process.StartInfo = info;
-            _process.Start();
-        }
-        
-        public T consumeEvent() 
-        {
-            var eventString = _process.StandardOutput.ReadLine();
-            try 
-            { 
-                var jsonDictionary = JsonConvert.DeserializeObject<T>(eventString);
-                return jsonDictionary;
-            }
-            catch { return null; }
-            
-        }
-
-    }
-    public class EventsJson 
-    {
-        public string EventType { get;  }
-        public string Data { get; }
-        public DateTime Timestamp { get; }
-
-        [JsonConstructor]
-
-        public EventsJson(string event_type, string data, int timestamp )
-        {
-            EventType = event_type;
-            Data = data;
-            Timestamp = new DateTime(timestamp);
         }
     }
 }
