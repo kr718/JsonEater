@@ -1,5 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading;
+using Serilog;
+using System.Diagnostics;
+using Serilog.Configuration;
 
 namespace JsonEater
 {
@@ -8,24 +11,24 @@ namespace JsonEater
 
         static void Main(string[] args)
         {
+            //Startup Configuration
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.Console().CreateLogger();
+
+            //autofac DI
+            //building the generatorProcess
             var config = ConfigurationReader.GetProcessPath(innerConfigLocation: "\\Configuration\\config.json");
             var info = PandaGenerator.CreateGeneratorProcessInfo(config.ProcessPath);
-            IConsumeEvents<PandaEvent> consumer = new PandaConsumer<PandaEvent>(info); // maybe process should be outside
-            var keepGoing = true;
-            while (keepGoing)
-            {
-                try
-                {
-                    var d = consumer.consumeEvent();
-                    Console.WriteLine(d);
-                    Console.WriteLine($"IS process running: {consumer.IsUp}");
-                }
-                catch
-                {
-                    keepGoing = false;
-                }
+            var process = PandaGenerator.CreateGeneratorProcess(info);
+            
 
-            }
+            //building the manager
+            IConsumeEvents<PandaEvent> consumer = new PandaConsumer<PandaEvent>(process);
+            IConsumptionWorker worker = new ConsumptionWorker<PandaEvent>(consumer);
+            IConsumptionManager manager = new ConsumptionManager<PandaEvent>(worker, new CancellationTokenSource());
+
+            manager.Start();
 
         }
     }

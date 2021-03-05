@@ -14,5 +14,13 @@ namespace JsonEater
 
             return info;
         }
+
+        public static Process CreateGeneratorProcess(ProcessStartInfo info)
+        {
+            var process = new Process();
+            process.StartInfo = info;
+            process.Start();
+            return process;
+        }
     }
 }

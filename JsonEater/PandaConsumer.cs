@@ -9,28 +9,31 @@ namespace JsonEater
         private readonly Process _process;
 
         public bool IsUp { get { return !_process.HasExited; } }
-        public PandaConsumer(ProcessStartInfo info)
+        public PandaConsumer(Process process)
         {
-            _process = new Process();
-            _process.StartInfo = info;
-            _process.Start();
+            _process = process;
         }
 
+        /// <summary>
+        /// consume a event from the process and returns it or throws exception. 
+        /// </summary>
+        /// <returns>Type T or Exception if corrupted</returns>
         public T consumeEvent()
         {
-            var eventString = _process.StandardOutput.ReadLine();
+            var jsonString = _process.StandardOutput.ReadLineAsync();
             try
             {
-                var jsonDictionary = JsonConvert.DeserializeObject<T>(eventString);
-                return jsonDictionary;
+                var jsonObject = JsonConvert.DeserializeObject<T>(jsonString.Result);
+                return jsonObject;
             }
             catch (Exception e)
             {
-                Log.Logger.Error(e.Message);
-                return default(T);
+                Log.Logger.Debug(e.Message);
+                throw e;
             }
 
         }
 
     }
 }
+
