@@ -1,11 +1,11 @@
-﻿using System;
+﻿//https://github.com/bigpandaio/challenge/tree/backend-engineer
+
 using System.Threading;
 using Serilog;
-using System.Diagnostics;
-using Serilog.Configuration;
 
 namespace JsonEater
 {
+    
     class Program
     {
 

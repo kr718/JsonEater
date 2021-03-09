@@ -133,7 +133,7 @@
     <Compile Include="Configuration\ConfigurationReader.cs" />
     <Compile Include="ConsumptionManager.cs" />
     <Compile Include="ConsumptionWorker.cs" />
-    <Compile Include="EventsJson.cs" />
+    <Compile Include="PandaEvent.cs" />
     <Compile Include="IConsumeEvents.cs" />
     <Compile Include="IConsumptionManager.cs" />
     <Compile Include="IConsumptionWorker.cs" />
