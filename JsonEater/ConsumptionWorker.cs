@@ -18,6 +18,7 @@ namespace JsonEater
                 {
                     var d = _consumer.consumeEvent();
                     Log.Logger.Information(d.ToString());
+                    //just want to commit
                 }
                 catch 
                 {
