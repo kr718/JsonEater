@@ -1,11 +1,12 @@
 ﻿//https://github.com/bigpandaio/challenge/tree/backend-engineer
 
 using System.Threading;
+using System;
 using Serilog;
 
 namespace JsonEater
 {
-    
+
     class Program
     {
 
@@ -18,10 +19,11 @@ namespace JsonEater
 
             //autofac DI
             //building the generatorProcess
-            var config = ConfigurationReader.GetProcessPath(innerConfigLocation: "\\Configuration\\config.json");
+            pandaGeneratorConfig config;
+            ConfigurationReader.GetProcessPath(out config, innerConfigLocation: @"\Configuration\ConfigurationReader.cs");
             var info = PandaGenerator.CreateGeneratorProcessInfo(config.ProcessPath);
             var process = PandaGenerator.CreateGeneratorProcess(info);
-            
+
 
             //building the manager
             IConsumeEvents<PandaEvent> consumer = new PandaConsumer<PandaEvent>(process);

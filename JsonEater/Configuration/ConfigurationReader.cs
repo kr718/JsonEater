@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Microsoft.Extensions.Configuration;
-namespace JsonEater
+﻿namespace JsonEater
 {
     public class ConfigurationReader
     {
-        public static pandaGeneratorConfig GetProcessPath(string innerConfigLocation = "\\Configuration\\config.json")
+        public static void GetProcessPath( out pandaGeneratorConfig config, string innerConfigLocation)
         {
             using (var f = new StreamReader(Directory.GetCurrentDirectory() + innerConfigLocation))
             {
                 var fileContent = f.ReadToEnd();
-                var pgc = Newtonsoft.Json.JsonConvert.DeserializeObject<pandaGeneratorConfig>(fileContent);
-                return pgc;
+                config = Newtonsoft.Json.JsonConvert.DeserializeObject<pandaGeneratorConfig>(fileContent);
             }
 
         }
